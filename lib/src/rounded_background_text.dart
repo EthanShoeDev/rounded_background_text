@@ -8,6 +8,7 @@ import '../rounded_background_text.dart';
 const Color kDefaultRoundedTextBackgroundColor = Colors.blue;
 const double kDefaultInnerFactor = 8.0;
 const double kDefaultOuterFactor = 10.0;
+const double kbackgroundPaddingFactor = 0.3;
 
 /// Gets the foreground color based on [backgroundColor]
 Color? foregroundColor(Color? backgroundColor) {
@@ -21,12 +22,14 @@ Color? foregroundColor(Color? backgroundColor) {
 List<List<LineMetricsHelper>> generateLineInfosForPainter(
   TextPainter painter, [
   double maxWidth = double.infinity,
+  double backgroundPaddingFactor = kbackgroundPaddingFactor,
 ]) {
   painter.layout(maxWidth: maxWidth);
   final metrics = painter.computeLineMetrics();
 
   final helpers = metrics.map((lineMetric) {
-    return LineMetricsHelper(lineMetric, metrics.length);
+    return LineMetricsHelper(
+        lineMetric, metrics.length, backgroundPaddingFactor);
   });
 
   final List<List<LineMetricsHelper>> lineInfos = [[]];
@@ -56,43 +59,44 @@ const singleLinePadding = EdgeInsets.symmetric(
 ///  * [TextStyle], used to customize the text look and feel
 class RoundedBackgroundText extends StatelessWidget {
   /// Creates a rounded background text with a single style.
-  RoundedBackgroundText(
-    String text, {
-    Key? key,
-    TextStyle? style,
-    this.textDirection,
-    this.textAlign,
-    this.backgroundColor,
-    this.textWidthBasis,
-    this.ellipsis,
-    this.locale,
-    this.strutStyle,
-    this.textScaleFactor = 1.0,
-    this.maxLines,
-    this.textHeightBehavior,
-    this.innerRadius = kDefaultInnerFactor,
-    this.outerRadius = kDefaultOuterFactor,
-  })  : text = TextSpan(text: text, style: style),
+  RoundedBackgroundText(String text,
+      {Key? key,
+      TextStyle? style,
+      this.textDirection,
+      this.textAlign,
+      this.backgroundColor,
+      this.textWidthBasis,
+      this.ellipsis,
+      this.locale,
+      this.strutStyle,
+      this.textScaleFactor = 1.0,
+      this.maxLines,
+      this.textHeightBehavior,
+      this.innerRadius = kDefaultInnerFactor,
+      this.outerRadius = kDefaultOuterFactor,
+      this.backgroundPaddingFactor = kbackgroundPaddingFactor})
+      : text = TextSpan(text: text, style: style),
         super(key: key);
 
   /// Creates a rounded background text based on an [InlineSpan], that can have
   /// multiple styles
-  const RoundedBackgroundText.rich({
-    Key? key,
-    required this.text,
-    this.textDirection,
-    this.backgroundColor,
-    this.textAlign,
-    this.textWidthBasis,
-    this.ellipsis,
-    this.locale,
-    this.strutStyle,
-    this.textScaleFactor = 1.0,
-    this.maxLines,
-    this.textHeightBehavior,
-    this.innerRadius = kDefaultInnerFactor,
-    this.outerRadius = kDefaultOuterFactor,
-  })  : assert(innerRadius >= 0.0 && innerRadius <= 20.0),
+  const RoundedBackgroundText.rich(
+      {Key? key,
+      required this.text,
+      this.textDirection,
+      this.backgroundColor,
+      this.textAlign,
+      this.textWidthBasis,
+      this.ellipsis,
+      this.locale,
+      this.strutStyle,
+      this.textScaleFactor = 1.0,
+      this.maxLines,
+      this.textHeightBehavior,
+      this.innerRadius = kDefaultInnerFactor,
+      this.outerRadius = kDefaultOuterFactor,
+      this.backgroundPaddingFactor = kbackgroundPaddingFactor})
+      : assert(innerRadius >= 0.0 && innerRadius <= 20.0),
         assert(outerRadius >= 0.0 && outerRadius <= 20.0),
         super(key: key);
 
@@ -162,57 +166,56 @@ class RoundedBackgroundText extends StatelessWidget {
   ///
   ///   * [SelectableText], a run of selectable text with a single style.
   ///   * [RoundedBackgroundTextField], the editable version of this widget.
-  static Widget selectableRich(
-    TextSpan textSpan, {
-    Key? key,
-    FocusNode? focusNode,
-    bool autofocus = false,
-    ToolbarOptions toolbarOptions = const ToolbarOptions(
-      selectAll: true,
-      copy: true,
-    ),
-    TextSelectionControls? selectionControls,
-    TextStyle? style,
-    TextDirection? textDirection,
-    Color? backgroundColor,
-    TextAlign textAlign = TextAlign.start,
-    TextWidthBasis? textWidthBasis,
-    double textScaleFactor = 1.0,
-    double innerRadius = kDefaultInnerFactor,
-    double outerRadius = kDefaultOuterFactor,
-    MouseCursor? mouseCursor,
-    double cursorWidth = 2.0,
-    Color? cursorColor,
-    double? cursorHeight,
-    Radius? cursorRadius,
-    SelectionChangedCallback? onSelectionChanged,
-    bool enableInteractiveSelection = true,
-  }) {
+  static Widget selectableRich(TextSpan textSpan,
+      {Key? key,
+      FocusNode? focusNode,
+      bool autofocus = false,
+      ToolbarOptions toolbarOptions = const ToolbarOptions(
+        selectAll: true,
+        copy: true,
+      ),
+      TextSelectionControls? selectionControls,
+      TextStyle? style,
+      TextDirection? textDirection,
+      Color? backgroundColor,
+      TextAlign textAlign = TextAlign.start,
+      TextWidthBasis? textWidthBasis,
+      double textScaleFactor = 1.0,
+      double innerRadius = kDefaultInnerFactor,
+      double outerRadius = kDefaultOuterFactor,
+      MouseCursor? mouseCursor,
+      double cursorWidth = 2.0,
+      Color? cursorColor,
+      double? cursorHeight,
+      Radius? cursorRadius,
+      SelectionChangedCallback? onSelectionChanged,
+      bool enableInteractiveSelection = true,
+      double backgroundPaddingFactor = kbackgroundPaddingFactor}) {
     final controller = _TextSpanEditingController(textSpan: textSpan);
     return RoundedBackgroundTextField(
-      key: key,
-      controller: controller,
-      focusNode: focusNode,
-      autofocus: autofocus,
-      toolbarOptions: toolbarOptions,
-      style: style,
-      readOnly: true,
-      textDirection: textDirection,
-      backgroundColor: backgroundColor,
-      textAlign: textAlign,
-      textScaleFactor: textScaleFactor,
-      innerRadius: innerRadius,
-      outerRadius: outerRadius,
-      mouseCursor: mouseCursor,
-      autocorrect: false,
-      cursorColor: cursorColor,
-      cursorHeight: cursorHeight,
-      cursorRadius: cursorRadius,
-      cursorWidth: cursorWidth,
-      selectionControls: selectionControls,
-      onSelectionChanged: onSelectionChanged,
-      enableInteractiveSelection: enableInteractiveSelection,
-    );
+        key: key,
+        controller: controller,
+        focusNode: focusNode,
+        autofocus: autofocus,
+        toolbarOptions: toolbarOptions,
+        style: style,
+        readOnly: true,
+        textDirection: textDirection,
+        backgroundColor: backgroundColor,
+        textAlign: textAlign,
+        textScaleFactor: textScaleFactor,
+        innerRadius: innerRadius,
+        outerRadius: outerRadius,
+        mouseCursor: mouseCursor,
+        autocorrect: false,
+        cursorColor: cursorColor,
+        cursorHeight: cursorHeight,
+        cursorRadius: cursorRadius,
+        cursorWidth: cursorWidth,
+        selectionControls: selectionControls,
+        onSelectionChanged: onSelectionChanged,
+        enableInteractiveSelection: enableInteractiveSelection,
+        backgroundPaddingFactor: backgroundPaddingFactor);
   }
 
   /// The text to display in this widget.
@@ -285,34 +288,37 @@ class RoundedBackgroundText extends StatelessWidget {
   /// {@end-template}
   final double outerRadius;
 
+  final double backgroundPaddingFactor;
+
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = DefaultTextStyle.of(context);
     final style = text.style ?? defaultTextStyle.style;
     return _RoundedBackgroundText(
-      text: TextSpan(
-        children: [text],
-        style: TextStyle(
-          color: foregroundColor(backgroundColor),
-          leadingDistribution: TextLeadingDistribution.proportional,
-          fontSize: style.fontSize ?? 16.0,
-        ).merge(style),
-      ),
-      textDirection:
-          textDirection ?? Directionality.maybeOf(context) ?? TextDirection.ltr,
-      textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
-      backgroundColor: backgroundColor ?? Colors.transparent,
-      textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
-      maxLines: maxLines ?? defaultTextStyle.maxLines,
-      textHeightBehavior:
-          textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
-      ellipsis: ellipsis,
-      locale: locale,
-      strutStyle: strutStyle,
-      textScaleFactor: textScaleFactor,
-      innerFactor: innerRadius,
-      outerFactor: outerRadius,
-    );
+        text: TextSpan(
+          children: [text],
+          style: TextStyle(
+            color: foregroundColor(backgroundColor),
+            leadingDistribution: TextLeadingDistribution.proportional,
+            fontSize: style.fontSize ?? 16.0,
+          ).merge(style),
+        ),
+        textDirection: textDirection ??
+            Directionality.maybeOf(context) ??
+            TextDirection.ltr,
+        textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
+        backgroundColor: backgroundColor ?? Colors.transparent,
+        textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
+        maxLines: maxLines ?? defaultTextStyle.maxLines,
+        textHeightBehavior:
+            textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
+        ellipsis: ellipsis,
+        locale: locale,
+        strutStyle: strutStyle,
+        textScaleFactor: textScaleFactor,
+        innerFactor: innerRadius,
+        outerFactor: outerRadius,
+        backgroundPaddingFactor: backgroundPaddingFactor);
   }
 }
 
@@ -341,22 +347,23 @@ class _TextSpanEditingController extends TextEditingController {
 }
 
 class _RoundedBackgroundText extends StatefulWidget {
-  const _RoundedBackgroundText({
-    Key? key,
-    required this.text,
-    required this.textDirection,
-    this.backgroundColor = kDefaultRoundedTextBackgroundColor,
-    this.maxLines,
-    this.textAlign = TextAlign.center,
-    this.textWidthBasis = TextWidthBasis.parent,
-    this.textScaleFactor = 1,
-    this.strutStyle,
-    this.locale,
-    this.textHeightBehavior,
-    this.ellipsis,
-    this.innerFactor = kDefaultInnerFactor,
-    this.outerFactor = kDefaultOuterFactor,
-  }) : super(key: key);
+  const _RoundedBackgroundText(
+      {Key? key,
+      required this.text,
+      required this.textDirection,
+      this.backgroundColor = kDefaultRoundedTextBackgroundColor,
+      this.maxLines,
+      this.textAlign = TextAlign.center,
+      this.textWidthBasis = TextWidthBasis.parent,
+      this.textScaleFactor = 1,
+      this.strutStyle,
+      this.locale,
+      this.textHeightBehavior,
+      this.ellipsis,
+      this.innerFactor = kDefaultInnerFactor,
+      this.outerFactor = kDefaultOuterFactor,
+      this.backgroundPaddingFactor = kbackgroundPaddingFactor})
+      : super(key: key);
 
   final InlineSpan text;
   final TextDirection textDirection;
@@ -373,6 +380,8 @@ class _RoundedBackgroundText extends StatefulWidget {
 
   final double innerFactor;
   final double outerFactor;
+
+  final double backgroundPaddingFactor;
 
   @override
   __RoundedBackgroundTextState createState() => __RoundedBackgroundTextState();
@@ -420,7 +429,8 @@ class __RoundedBackgroundTextState extends State<_RoundedBackgroundText> {
       ellipsis: widget.ellipsis,
     );
 
-    lineInfos = generateLineInfosForPainter(painter, lastMaxWidth);
+    lineInfos = generateLineInfosForPainter(
+        painter, lastMaxWidth, widget.backgroundPaddingFactor);
     requiredSize = painter.size;
   }
 
@@ -825,11 +835,13 @@ class LineMetricsHelper {
   ///
   ///  * [isLast], which uses this property to check the amount of lines
   final int length;
+  final double backgroundPaddingFactor;
 
   double? overridenWidth;
   double? overridenX;
 
-  LineMetricsHelper(this.metrics, this.length);
+  LineMetricsHelper(this.metrics, this.length,
+      [this.backgroundPaddingFactor = 0.3]);
 
   /// Whether this line has no content
   bool get isEmpty => metrics.width == 0.0;
@@ -838,22 +850,22 @@ class LineMetricsHelper {
   bool get isLast => metrics.lineNumber == length - 1;
 
   late EdgeInsets firstLinePadding = EdgeInsets.only(
-    left: height * 0.3,
-    right: height * 0.3,
-    top: height * 0.3,
+    left: height * backgroundPaddingFactor,
+    right: height * backgroundPaddingFactor,
+    top: height * backgroundPaddingFactor,
     bottom: 0,
   );
   late EdgeInsets innerLinePadding = EdgeInsets.only(
-    left: height * 0.3,
-    right: height * 0.3,
+    left: height * backgroundPaddingFactor,
+    right: height * backgroundPaddingFactor,
     top: 0.0,
-    bottom: height * 0.15,
+    bottom: height * (backgroundPaddingFactor / 2),
   );
   late EdgeInsets lastLinePadding = EdgeInsets.only(
-    left: height * 0.3,
-    right: height * 0.3,
+    left: height * backgroundPaddingFactor,
+    right: height * backgroundPaddingFactor,
     top: 0.0,
-    bottom: height * 0.15,
+    bottom: height * (backgroundPaddingFactor / 2),
   );
 
   /// Dynamically calculate the outer factor based on the provided [outerFactor]
